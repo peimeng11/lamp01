@@ -1,0 +1,160 @@
+{extend name='base'}
+{block name='body'}
+<div class="x-body">
+    <form class="layui-form" method="post" action="/admin/new/update" >
+      <input id="Imgurl" type="hidden" name="newsimg" value="" placeholder="">
+      <input type="hidden" name="id" value="{$news.id}" >
+        <div class="layui-form-item">
+            <label for="role" class="layui-form-label">
+                <span class="x-red">*</span>新闻类别
+            </label>
+            <div class="layui-input-inline">
+              <select name="tid">
+                {volist name='list' id='vo'}
+                <option value="{$vo.id}" {if condition="$vo.id==$news.tid"}selected{/if}>{$vo.name}</option>
+                {/volist}
+              </select>
+            </div>
+             <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>新闻所属类别
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="title" class="layui-form-label">
+                <span class="x-red">*</span>新闻标题
+            </label>
+       
+            <div class="layui-input-inline">
+                <input type="text" id="title" name="title" required="" 
+                autocomplete="off" class="layui-input" value="{$news.title}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="link" class="layui-form-label">
+                <span class="x-red">*</span>文章配图
+            </label>
+            <div class="layui-input-inline">
+              <div class="site-demo-upbar">
+                <input type="file" name="file" class="layui-upload-file" id="test">
+              </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label  class="layui-form-label">原配图
+            </label>
+            <img id="LAY_demo_upload" width="200" src="/static/admin/uploads/news/{$news.newsimg}">
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label for="L_content" class="layui-form-label" style="top: -2px;">
+                文章内容
+            </label>
+            <div class="layui-input-block">
+                <textarea id="L_content" name="content" 
+                placeholder="请输入内容" class="layui-textarea fly-editor" style="height: 260px;">{$news->getData('content')}</textarea>
+            </div>
+            
+        </div> 
+          <div class="layui-form-item">
+            <label for="role" class="layui-form-label">
+                <span class="x-red">*</span>是否置顶
+            </label>
+            <div class="layui-input-inline">
+              <select name="stick">
+                <option value="2" {if condition="2==$news.stick"}selected{/if}>不置顶</option>
+                <option value="1" {if condition="1==$news.stick"}selected{/if}>置顶</option>
+              </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="L_repass" class="layui-form-label">
+            </label>
+            <button  class="layui-btn" lay-filter="add" lay-submit="">
+                增加
+            </button>
+        </div>
+    </form>
+</div> 
+{/block}
+{block name='ojs'}
+<script>
+            layui.use(['form','layer','upload','layedit'], function(){
+                $ = layui.jquery;
+              var form = layui.form()
+              ,layer = layui.layer
+              ,layedit = layui.layedit;
+
+              ///图片上传接口
+            layui.upload({
+              url: '/admin/news/upload' //上传接口
+              ,success: function(res){ //上传成功后的回调
+                  console.log(res);
+                $('#LAY_demo_upload').attr('src',res.data.src);
+                $('#Imgurl').attr('value',res.data.title);
+              }
+            });
+            var inp =document.getElementsByTagName("input");
+              
+              layedit.set({
+                uploadImage: {
+                  url: "/admin/news/upload" //接口url
+                  ,type: 'post' //默认post
+                }
+              })
+        
+            //创建一个编辑器
+            editIndex = layedit.build('L_content',{
+
+              tool: [
+              'strong' //加粗
+              ,'italic' //斜体
+              ,'underline' //下划线
+              ,'del' //删除线
+              
+              ,'|' //分割线
+              
+              ,'left' //左对齐
+              ,'center' //居中对齐
+              ,'right' //右对齐
+              ,'link' //超链接
+              ,'unlink' //清除链接
+              ,'face' //表情
+              ,'image' //插入图片
+              // ,'help' //帮助
+            ]
+            });
+            var inp = document.getElementsByName("file");
+              //监听提交
+              form.on('submit(add)', function(data){
+                  data.field.content = layedit.getContent(editIndex);
+                  //执行提交
+                  $.ajax({
+                      url:"/admin/news/update",//url的请求地址
+                      type:"POST",//请求方式
+                      data:data.field, //传参
+                      asyn:true,//异步
+                      dataType:"json",//预期服务器返回的数据类型
+                      success:function(succdata){
+                          //是否提交成功
+                          if (succdata.code!=0) {
+                              layer.msg(succdata.info, {icon: 5});
+                          }else{
+                              layer.alert("增加成功", {icon: 6},function () {
+                                  // 获得frame索引
+                                  var index = parent.layer.getFrameIndex(window.name);
+                                  window.parent.location.reload();
+                                  //关闭当前frame
+                                  parent.layer.close(index);
+                              });
+                          }
+                      },
+                      error:function (XMLHttpRequest, textStatus, errorThrown) {
+                          layer.msg('提交失败，请重试。。', {icon: 5});
+                      }
+                  });
+              
+                  return false;
+              });
+              
+            });
+        </script>
+{/block}

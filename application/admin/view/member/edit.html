@@ -1,0 +1,124 @@
+{extend name='base'}
+{block name='body'}
+<div class="x-body">
+    <form class="layui-form" method="post" action="/admin/user/save" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{$list.id}" placeholder="">
+        <div class="layui-form-item">
+            <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>登录名
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="username" name="username" required="" lay-verify="username"
+                autocomplete="off" class="layui-input" value="{$list.username}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>将会成为您唯一的登入名
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="phone" class="layui-form-label">
+                <span class="x-red">*</span>手机
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="phone" name="phone" required="" lay-verify="phone"
+                autocomplete="off" class="layui-input" value="{$list.phone}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>将会成为您唯一的登入名
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="L_email" class="layui-form-label">
+                <span class="x-red">*</span>邮箱
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="L_email" name="email" required="" lay-verify="email"
+                autocomplete="off" class="layui-input" value="{$list.email}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>
+            </div>
+        </div>
+        <!-- <div class="layui-form-item">
+            <label for="link" class="layui-form-label">
+                <span class="x-red">*</span>头像
+            </label>
+            <div class="layui-input-inline">
+              <div class="site-demo-upbar">
+                <input type="file" name="avatar" class="layui-upload-file" >
+              </div>
+            </div>
+        </div> -->
+        <div class="layui-form-item">
+            <label for="role" class="layui-form-label">
+                <span class="x-red">*</span>角色
+            </label>
+            <div class="layui-input-inline">
+              <select name="role">
+                <option value="1" {if condition="$list->getData('role')==1"}selected{/if}>超级管理员</option>
+                <option value="2" {if condition="$list->getData('role')==2"}selected{/if}>普通管理员</option>
+              </select>
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <label for="L_repass" class="layui-form-label">
+            </label>
+            <button  class="layui-btn" lay-filter="add" lay-submit="">
+                修改
+            </button>
+        </div>
+    </form>
+</div>
+{/block}
+{block name='ojs'}
+<script>
+    layui.use(['form','layer'], function(){
+        $ = layui.jquery;
+        var form = layui.form()
+        ,layer = layui.layer;
+        
+        //判断是否有权限
+        // if ({$}) {}
+        //自定义验证规则
+        form.verify({
+            username: function(value){
+              if(value.length < 4){
+                return '昵称至少得4个字符啊';
+              }
+            }
+        });
+
+        //监听提交
+        form.on('submit(add)', function(data){
+            //执行提交
+            $.ajax({
+                url:"/admin/user/update",//url的请求地址
+                type:"POST",//请求方式
+                data:data.field, //传参
+                asyn:true,//异步
+                dataType:"json",//预期服务器返回的数据类型
+                success:function(succdata){
+                    //是否提交成功
+                    if (succdata.code!=0) {
+                        layer.msg(succdata.info, {icon: 5});
+                    }else{
+                        layer.alert(succdata.info, {icon: 6},function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            window.parent.location.reload();
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }
+                },
+                error:function (XMLHttpRequest, textStatus, errorThrown) {
+                    layer.msg('提交失败，请重试。。', {icon: 5});
+                }
+            });
+        
+            return false;
+        });
+    });
+</script>
+{/block}

@@ -1,0 +1,107 @@
+{extend name='base'}
+{block name='body'}
+<div class="x-body">
+    <form class="layui-form" method="post" action="/admin/type/save" >
+        <div class="layui-form-item">
+            <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>导航名
+            </label>
+       
+            <div class="layui-input-inline">
+                <input type="text"  name="name" required=""
+                autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>新增首页导航名
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>描述
+            </label>
+       
+            <div class="layui-input-inline">
+                <input type="text"  name="desc" required="" 
+                autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>导航功能描述
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>链接地址
+            </label>
+       
+            <div class="layui-input-inline">
+                <input type="text" name="link" required="" 
+                autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>点击导航后所去的模块控制器方法
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>显示顺序
+            </label>
+       
+            <div class="layui-input-inline">
+                <input type="text"  name="sort" required="" 
+                autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>1-999 越小越靠前
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="L_repass" class="layui-form-label">
+            </label>
+            <button  class="layui-btn" lay-filter="add" lay-submit="">
+                增加
+            </button>
+        </div>
+    </form>
+</div>
+       
+{/block}
+{block name='ojs'}
+<script>
+            layui.use(['form','layer','upload'], function(){
+                $ = layui.jquery;
+              var form = layui.form()
+              ,layer = layui.layer;
+              //监听提交
+              form.on('submit(add)', function(data){
+                  //执行提交
+                  $.ajax({
+                      url:"/admin/nav/save",//url的请求地址
+                      type:"POST",//请求方式
+                      data:data.field, //传参
+                      asyn:true,//异步
+                      dataType:"json",//预期服务器返回的数据类型
+                      success:function(succdata){
+                          //是否提交成功
+                          if (succdata.code!=0) {
+                              layer.msg(succdata.info, {icon: 5});
+                          }else{
+                              layer.alert("增加成功", {icon: 6},function () {
+                                  // 获得frame索引
+                                  var index = parent.layer.getFrameIndex(window.name);
+                                  window.parent.location.reload();
+                                  //关闭当前frame
+                                  parent.layer.close(index);
+                              });
+                          }
+                      },
+                      error:function (XMLHttpRequest, textStatus, errorThrown) {
+                          layer.msg('提交失败，请重试。。', {icon: 5});
+                      }
+                  });
+              
+                  return false;
+              });
+              
+            });
+        </script>
+{/block}

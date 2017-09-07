@@ -1,0 +1,122 @@
+{extend name='base'}
+{block name='tcss'}
+<link rel="stylesheet" href="/static/admin/lib/bootstrap/css/bootstrap.min.css" >
+{/block}
+{block name='body'}
+<div class="x-nav">
+    <span class="layui-breadcrumb">
+      <a><cite>首页管理</cite></a>
+      <a><cite>首页导航列表</cite></a>
+    </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <xblock>
+    <div {:role()} class="layui-input-inline" style="width:auto;">
+        <a class="layui-btn layui-btn-danger" onclick="admin_add('添加用户','/admin/nav/add','600','500')"><i class="layui-icon">&#xe608;</i>添加</a>
+    </div>
+        
+        
+    </xblock>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>导航名</th>
+                <th>描述</th>
+                <th>跳转地址</th>
+                <th>排序顺序</th>
+                <th>是否显示</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody class="tbody">
+        {volist name='list' id='vo'}
+            <tr>
+                <td>{$vo.id}</td>
+                <td>{$vo.name}</td>
+                <td>{$vo.desc}</td>
+                <td>{$vo.link}</td>
+                <td>{$vo.sort}</td>
+
+                <td class="td-status">{$vo.show}</td>
+                <td class="td-manage">
+                    {if condition="$vo->getData('show')==1"}
+                    <a style="text-decoration:none" onclick="admin_stop(this,{$vo.id})" href="javascript:;" title="隐藏">
+                        <i class="layui-icon">&#xe601;</i>
+                    </a>
+                    {else/}
+                    <a style="text-decoration:none" onclick="admin_start(this,{$vo.id})" href="javascript:;" title="显示"><i class="layui-icon">&#xe62f;</i></a>
+                    {/if}
+
+                    <a title="编辑" href="javascript:;" onclick="admin_edit('编辑','/admin/nav/edit/id/{$vo.id}','4','600','410')"
+                    class="ml-5" style="text-decoration:none">
+                        <i class="layui-icon">&#xe642;</i>
+                    </a>
+
+                </td>
+            </tr>
+        {/volist}
+        </tbody>
+    </table>
+   
+    {$list->render()}
+    
+</div>
+{/block}
+
+{block name='ojs'}
+<script>
+    layui.use(['laydate','layer','form'], function(){
+      $ = layui.jquery;//jquery
+      layer = layui.layer;//弹出层      
+    });
+     /*添加*/
+    function admin_add(title,url,w,h){
+        x_admin_show(title,url,w,h);
+    }
+
+    /*停用*/
+    function admin_stop(obj,id){
+        layer.confirm('确认要隐藏吗？',function(index){
+            //发异步把用户状态进行更改
+            $.get('/admin/nav/hidden/id/'+id,function(succdata){
+              //是否提交成功
+              if (succdata.code!=0) {
+                  layer.msg(succdata.info, {icon: 5,time:1000});
+              }else{
+                  $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="admin_start(this,'+id+')" href="javascript:;" title="显示"><i class="layui-icon">&#xe62f;</i></a>');
+                  $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-danger layui-btn-mini">隐藏</span>');
+                  $(obj).remove();
+                  layer.msg(succdata.info, {icon: 6,time:1000});
+                  // window.location.reload();
+              }
+            });
+        });
+    }
+
+    /*启用*/
+    function admin_start(obj,id){
+        layer.confirm('确认要显示吗？',function(index){
+            //发异步把用户状态进行更改
+            $.get('/admin/nav/show/id/'+id,function(succdata){
+              //是否提交成功
+              if (succdata.code!=0) {
+                  layer.msg(succdata.info, {icon: 5,time:1000});
+              }else{
+                  $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="admin_stop(this,'+id+')" href="javascript:;" title="隐藏"><i class="layui-icon">&#xe601;</i></a>');
+                  $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-normal layui-btn-mini">显示</span>');
+                  $(obj).remove();
+                  layer.msg(succdata.info, {icon: 6,time:1000});
+                  // window.location.reload();
+              }
+            });
+        });
+    }
+    //编辑
+    function admin_edit (title,url,id,w,h) {
+        x_admin_show(title,url,w,h); 
+    }
+   
+</script>
+{/block}

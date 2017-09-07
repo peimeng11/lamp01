@@ -1,0 +1,125 @@
+{extend name='base'}
+{block name='body'}
+<div class="x-body">
+            <form class="layui-form  layui-form-pane" method="post" action="/admin/artical/save" >
+                <div class="layui-form-item">
+                    <label for="L_title" class="layui-form-label">
+                      <span class="x-red">*</span>标题
+                    </label>
+                    <div class="layui-input-block">
+                        <input id="L_title" name="title" required="" lay-verify="title" autocomplete="off" class="layui-input" type="text">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label for="role" class="layui-form-label">
+                        <span class="x-red">*</span>文章类别
+                    </label>
+                    <div class="layui-input-inline">
+                      <select name="tid">
+                        {volist name='list' id='vo'}
+                        <option value="{$vo.id}">{$vo.name}</option>
+                        {/volist}
+                      </select>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">
+                        <span class="x-red">*</span>选择文章类别
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label for="L_content" class="layui-form-label" style="_top: -2px;">
+                        描述
+                    </label>
+                    <div class="layui-input-block">
+                        <textarea id="L_content" name="content" 
+                        placeholder="请输入内容" class="layui-textarea fly-editor" style="height: 260px;"></textarea>
+                    </div>
+                    
+                </div>
+               
+               
+                
+                <div class="layui-form-item">
+                    <button  class="layui-btn" lay-filter="add" lay-submit="">
+                        增加
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div id="info" style="display: none;">{$info}</div>
+       
+{/block}
+{block name='ojs'}
+<script>
+            layui.use(['form','layer','layedit'], function(){
+                $ = layui.jquery;
+              var form = layui.form()
+              ,layer = layui.layer
+              ,layedit = layui.layedit;
+              
+              var inp =document.getElementsByTagName("input");
+                
+                layedit.set({
+                  uploadImage: {
+                    url: "./upimg.json" //接口url
+                    ,type: 'post' //默认post
+                  }
+                })
+        
+            //创建一个编辑器
+            editIndex = layedit.build('L_content',{
+                tool: ['strong','italic','|','left', 'center', 'right', '|', 'face']
+            });
+            var inp = document.getElementsByName("file");
+            console.log(inp)
+                
+            // //图片上传接口
+            //   layui.upload({
+            //         url:'/static/admin/action/upload.json',
+            //         success: function(res){
+            //            alert(res.src);
+            //         }
+                    
+            //   });
+              //自定义验证规则
+              form.verify({
+                username: function(value){
+                  if(value.length < 1){
+                    return '昵称至少得1个字符啊';
+                  }
+                }
+                ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+                ,repass: function(value){
+                    if($('#L_pass').val()!=$('#L_repass').val()){
+                        return '两次密码不一致';
+                    }
+                }
+              });
+
+              // //监听提交
+              // form.on('submit(add)', function(data){
+                
+              //   //发异步，把数据提交给php
+              //   layer.alert("增加成功", {icon: 6},function () {
+              //       // 获得frame索引
+              //       var index = parent.layer.getFrameIndex(window.name);
+              //       //关闭当前frame
+              //       parent.layer.close(index);
+              //   });
+              //   return false;
+              // });
+            var info = $('#info').text();
+            if (info!='') {
+                layer.alert(info, {
+                  title: '提示信息',
+                },function(){
+                    //获得frame索引
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index); 
+                    
+                })
+            } 
+              
+            });
+        </script>
+{/block}

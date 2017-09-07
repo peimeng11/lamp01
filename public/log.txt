@@ -1,0 +1,45 @@
+request body = <TemplateSMS>
+                    <to>15110495729</to> 
+                    <appId>8a216da85a1158e2015a16d1a2fe016f</appId>
+                    <templateId>1</templateId>
+                    <datas><data>9871</data><data>1</data></datas>
+                  </TemplateSMS>
+request url = https://app.cloopen.com:8883/2013-12-26/Accounts/8a216da85a1158e2015a16d1a288016b/SMS/TemplateSMS?sig=B8902DF01DF1153C11A4AE538F3B170F
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Response>
+    <statusCode>000000</statusCode>
+    <TemplateSMS>
+        <smsMessageSid>0b31c5fd748a4d6eb9cfed2c395c3404</smsMessageSid>
+        <dateCreated>20170816101921</dateCreated>
+    </TemplateSMS>
+</Response>
+
+request body = <TemplateSMS>
+                    <to>15110495729</to> 
+                    <appId>8a216da85a1158e2015a16d1a2fe016f</appId>
+                    <templateId>1</templateId>
+                    <datas><data>9871</data><data>1</data></datas>
+                  </TemplateSMS>
+request url = https://app.cloopen.com:8883/2013-12-26/Accounts/8a216da85a1158e2015a16d1a288016b/SMS/TemplateSMS?sig=23664EF5E18FB15C461AA23AF8FB8954
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Response>
+    <statusCode>160038</statusCode>
+    <statusMsg>短信验证码发送过频繁</statusMsg>
+</Response>
+
+request body = <TemplateSMS>
+                    <to>15110495729</to> 
+                    <appId>8a216da85a1158e2015a16d1a2fe016f</appId>
+                    <templateId>1</templateId>
+                    <datas><data>9871</data><data>1</data></datas>
+                  </TemplateSMS>
+request url = https://app.cloopen.com:8883/2013-12-26/Accounts/8a216da85a1158e2015a16d1a288016b/SMS/TemplateSMS?sig=477D9B1906F08545024BC0AE154A7CB3
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Response>
+    <statusCode>000000</statusCode>
+    <TemplateSMS>
+        <smsMessageSid>e313db9b23a24a76904c4039d2dad9e7</smsMessageSid>
+        <dateCreated>20170816102000</dateCreated>
+    </TemplateSMS>
+</Response>
+

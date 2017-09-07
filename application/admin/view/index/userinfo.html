@@ -1,0 +1,42 @@
+{extend name='base'}
+{block name='body'}
+<div class="x-body">
+    <blockquote class="layui-elem-quote">
+        <img src="/static/admin/uploads/headimg/{$list.avatar=='logo.png'?'default/'.$list.avatar:$list.avatar}" class="layui-circle" style="width:50px;float:left">
+        <dl style="margin-left:80px; color:#019688">
+        <dt><span >用户名：{$list.username}&nbsp;&nbsp;|&nbsp;&nbsp;</span><span >状态：{$list.status}</span></dt>
+        <dd style="margin-left:0">角色：{$list.role}</dd>
+      </dl>
+    </blockquote>
+    <div class="pd-20">
+      <table  class="layui-table" lay-skin="line">
+        <tbody>
+          <tr>
+            <th>手机：</th>
+            <td>{$list.phone}</td>
+          </tr>
+          <tr>
+            <th>邮箱：</th>
+            <td>{$list.email}</td>
+          </tr>
+          <tr>
+            <th>登陆次数：</th>
+            <td>{$list.lognum}</td>
+          </tr>
+          <tr>
+            <th>注册时间：</th>
+            <td>{$list.create_time}</td>
+          </tr>
+          <tr>
+            <th>上次登陆时间：</th>
+            <td>{$list.lastlogtime}</td>
+          </tr>
+          <tr>
+            <th>上次登陆地址：</th>
+            <td>{$list.lastlogaddr}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+</div>
+{/block}

@@ -1,0 +1,216 @@
+{extend name='base'}
+{block name='tcss'}
+<link rel="stylesheet" href="/static/admin/lib/bootstrap/css/bootstrap.min.css" >
+{/block}
+{block name='body'}
+<div class="x-nav">
+    <span class="layui-breadcrumb">
+      <a><cite>首页管理</cite></a>
+      <a><cite>轮播图</cite></a>
+    </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <xblock>
+        <form class="layui-form " action="/admin/banner/index" method="get">
+            <div class="layui-form-pane" style="margin-top: 15px;">
+              <div class="layui-form-item">
+                <div class="layui-input-inline" style="width:auto;">
+                    <a class="layui-btn layui-btn-danger" onclick="admin_add('添加','/admin/banner/add','600','500')"><i class="layui-icon">&#xe608;</i>添加</a>
+                </div>
+                <label class="layui-form-label">
+                          每页
+                      </label>
+                      <div class="layui-input-inline" style="width: 100px">
+                        <select name="pagesize">
+                          <option value="10" {if condition="$pagesize==10"}selected{/if}>10</option>
+                          <option value="20" {if condition="$pagesize==20"}selected{/if}>20</option>
+                          <option value="30" {if condition="$pagesize==30"}selected{/if}>30</option>
+                          <option value="30" {if condition="$pagesize==50"}selected{/if}>50</option>
+                          <option value="{$num}" {if condition="$pagesize==$num"}selected{/if}>全部</option>
+                        </select>
+                      </div>
+                      <label class="layui-form-label" style="right:15px;">
+                          条
+                      </label>
+                <label class="layui-form-label">关键字</label>
+                <div class="layui-input-inline">
+                  <input type="text" name="title"  placeholder="描述内容的关键字" autocomplete="off" class="layui-input" value={$Think.get.title|default=''}>
+                </div>
+                <div class="layui-input-inline" style="">
+                    <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                </div> 
+                </form>  
+              </div>
+            </div> 
+          
+        
+    </xblock>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>描述</th>
+                <th>图片</th>
+                <th>链接地址</th>
+                <th>是否可删除</th>
+                <th>是否显示</th>
+                <th>添加时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="x-img">
+        {volist name='list' id='vo'}
+            <tr>
+                <td>{$vo.id}</td>
+                <td>{$vo.title}</td>
+                <td><img  src="/static/admin/uploads/banner/{$vo.imgurl}" width="200" alt="">点击图片试试</td>
+                <td>{$vo.link}</td>
+                <td class="td-del">{$vo.del}</td>
+
+                <td class="td-status">{$vo.show}</td>
+                <td >{$vo.ctime}</td>
+                <td class="td-manage">
+                    {if condition="$vo->getData('show')==1"}
+                    <a style="text-decoration:none" onclick="admin_stop(this,{$vo.id})" href="javascript:;" title="隐藏">
+                        <i class="layui-icon">&#xe601;</i>
+                    </a>
+                    {else/}
+                    <a style="text-decoration:none" onclick="admin_start(this,{$vo.id})" href="javascript:;" title="显示"><i class="layui-icon">&#xe62f;</i></a>
+                    {/if}
+
+                    <a title="编辑" href="javascript:;" onclick="admin_edit('编辑','/admin/banner/edit/id/{$vo.id}','4','600','410')"
+                    class="ml-5" style="text-decoration:none">
+                        <i class="layui-icon">&#xe642;</i>
+                    </a>
+                    <a title="删除" href="javascript:;" onclick="admin_del(this,{$vo.id})" 
+                    style="text-decoration:none">
+                        <i class="layui-icon">&#xe640;</i>
+                    </a>
+                    {if condition="$vo->getData('del')==1"}
+                    <a {:role()}  title="禁止删除" href="javascript:;" onclick="admin_undel(this,{$vo.id},{$vo->getData('del')})" 
+                    style="text-decoration:none">
+                        <i class="layui-icon">&#xe64f;</i>
+                    </a>
+                    {else/}
+                    <a {:role()} title="取消禁止" href="javascript:;" onclick="admin_undel(this,{$vo.id},{$vo->getData('del')})" 
+                    style="text-decoration:none">
+                        <i class="layui-icon">&#xe64f;</i>
+                    </a>
+                    {/if}
+
+                </td>
+            </tr>
+        {/volist}
+        </tbody>
+    </table>
+   
+    {$list->render()}
+    
+</div>
+{/block}
+
+{block name='ojs'}
+<script>
+    layui.use(['laydate','layer','form'], function(){
+      $ = layui.jquery;//jquery
+      layer = layui.layer;//弹出层 
+      //以上模块根据需要引入
+
+      layer.ready(function(){ //为了layer.ext.js加载完毕再执行
+        layer.photos({
+          photos: '#x-img'
+          //,shift: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+        });
+      });      
+    });
+     /*添加*/
+    function admin_add(title,url,w,h){
+        x_admin_show(title,url,w,h);
+    }
+
+     /*停用*/
+    function admin_stop(obj,id){
+        layer.confirm('确认要隐藏吗？',function(index){
+            //发异步把用户状态进行更改
+            $.get('/admin/banner/hidden/id/'+id,function(succdata){
+              //是否提交成功
+              if (succdata.code!=0) {
+                  layer.msg(succdata.info, {icon: 5,time:1000});
+              }else{
+                  $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="admin_start(this,'+id+')" href="javascript:;" title="显示"><i class="layui-icon">&#xe62f;</i></a>');
+                  $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-danger layui-btn-mini">隐藏</span>');
+                  $(obj).remove();
+                  layer.msg(succdata.info, {icon: 6,time:1000});
+                  // window.location.reload();
+              }
+            });
+        });
+    }
+
+    /*启用*/
+    function admin_start(obj,id){
+        layer.confirm('确认要显示吗？',function(index){
+            //发异步把用户状态进行更改
+            $.get('/admin/banner/show/id/'+id,function(succdata){
+              //是否提交成功
+              if (succdata.code!=0) {
+                  layer.msg(succdata.info, {icon: 5,time:1000});
+              }else{
+                  $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="admin_stop(this,'+id+')" href="javascript:;" title="隐藏"><i class="layui-icon">&#xe601;</i></a>');
+                  $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-normal layui-btn-mini">显示</span>');
+                  $(obj).remove();
+                  layer.msg(succdata.info, {icon: 6,time:1000});
+                  // window.location.reload();
+              }
+            });
+        });
+    }
+    //编辑
+    function admin_edit (title,url,id,w,h) {
+        x_admin_show(title,url,w,h); 
+    }
+    /*删除*/
+    function admin_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            //发异步删除数据
+            $.get('/admin/banner/del/id/'+id,function(succdata){
+              //是否提交成功
+              if (succdata.code!=0) {
+                  layer.msg(succdata.info, {icon: 5,time:2000});
+              }else{
+                  $(obj).parents("tr").remove();
+                  layer.msg(succdata.info, {icon: 6,time:2000});
+              }
+            });
+            
+        });
+    }
+     /*禁止删除*/
+    function admin_undel(obj,id,del){
+        layer.confirm('确认要禁止其他管理员删除吗？',function(index){
+            //发异步删除数据
+            $.get('/admin/banner/undel/id/'+id,function(succdata){
+              //是否提交成功
+              if (succdata.code!=0) {
+                  layer.msg(succdata.info, {icon: 5,time:2000});
+              }else{
+                  if (del==2) {
+                    del=1;
+                    $(obj).parents("tr").find(".td-manage").append('<a title="禁止删除" href="javascript:;" onclick="admin_undel(this,'+id+','+del+')" style="text-decoration:none"><i class="layui-icon">&#xe64f;</i></a>');
+                    $(obj).parents("tr").find(".td-del").html('<span class="layui-btn layui-btn-normal layui-btn-mini">YES</span>');
+                    $(obj).remove();
+                  }else{
+                    del=2;
+                    $(obj).parents("tr").find(".td-manage").append('<a title="取消禁止" href="javascript:;" onclick="admin_undel(this,'+id+','+del+')" style="text-decoration:none"><i class="layui-icon">&#xe64f;</i></a>');
+                    $(obj).parents("tr").find(".td-del").html('<span class="layui-btn layui-btn-danger layui-btn-mini">NO</span>');
+                    $(obj).remove();
+                  }
+                  layer.msg(succdata.info, {icon: 6,time:2000});
+              }
+            });
+            
+        });
+    }
+</script>
+{/block}

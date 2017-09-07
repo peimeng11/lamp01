@@ -1,0 +1,140 @@
+{extend name='base'}
+{block name='tcss'}
+<style type="text/css" media="screen">
+   .x-avtar{height:80px;}
+</style>
+{/block}
+{block name='body'}
+<div class="x-box">
+    <div class="x-top">
+        <i class="layui-icon x-login-close">
+            &#x1007;
+        </i>
+        <ul class="x-login-right">
+            <li style="background-color: #F1C85F;" color="#F1C85F">
+            </li>
+            <li style="background-color: #EA569A;" color="#EA569A">
+            </li>
+            <li style="background-color: #393D49;" color="#393D49">
+            </li>
+        </ul>
+    </div>
+    <div class="x-mid">
+        <div class="x-avtar">
+            <img src="/static/admin/images/logo.png" alt="">
+        </div>
+        <div class="input">
+            <form class="layui-form">
+                <div class="layui-form-item x-login-box">
+                    <label for="username" class="layui-form-label">
+                        <i class="layui-icon">&#xe612;</i>
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="username" name="username" required="" lay-verify="username"
+                        autocomplete="off" placeholder="手机/昵称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item x-login-box">
+                    <label for="pass" class="layui-form-label">
+                        <i class="layui-icon">&#xe628;</i>
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="password" id="pass" name="password" lay-verify="pass" required=""
+                        autocomplete="off" placeholder="密码" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item x-login-box">
+                    <label for="code" class="layui-form-label">
+                        <i class="layui-icon">&#xe64e;</i>
+                    </label>
+                    <div  class="layui-input-inline" style="width: 130px;">
+                        <input  type="text" id="code" name="captcha"
+                        autocomplete="off" placeholder="手机验证码" class="layui-input" required="">
+                        
+                    </div>
+                    <div class="layui-form-label">
+                       <button type="button" class='layui-btn' id="ms">点击获取</button>
+                    </div>
+                    <!-- <div class="layui-form-label">
+                       <img id="captcha_src" src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?id'+Math.random()">
+                    </div> -->
+                </div>
+                <div class="layui-form-item" id="loginbtn">
+                    <button  class="layui-btn" lay-filter="save" lay-submit="">
+                        登 录
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<p style="color:#fff;text-align: center;">Copyright © 2017.Company name All rights X-admin </p>
+{/block}
+
+{block name='bgc'}
+style="background-color: #393D49"
+{/block}
+{block name='ojs'}
+
+<script>
+    function resetCode()
+    {
+        //重置验证码
+        var cap = document.getElementById('captcha_src');
+        cap.src = cap.src+'?id'+Math.random();
+    }
+    layui.use(['form'],
+    function() {
+        $ = layui.jquery;
+        var form = layui.form(),
+        layer = layui.layer;
+
+        //登陆框按钮改变背景色
+        $('.x-login-right li').click(function(event) {
+            color = $(this).attr('color');
+            $('body').css('background-color', color);
+        });
+        $("#ms").click(function(){
+            $.get("/admin/login/ms",
+              function(data){
+                if (data==1) {
+                    alert('成功');
+                }else{
+                    alert('失败');
+                }
+              });
+        });
+        //监听表单提交
+        form.on('submit(save)',
+        function(data) {
+            //执行提交
+            $.ajax({
+                url:"/admin/login/dologin",//url的请求地址
+                type:"POST",//请求方式
+                data:data.field, //传参
+                asyn:true,//异步
+                dataType:"json",//预期服务器返回的数据类型
+                success:function(succdata){
+                    //是否提交成功
+                    if (succdata.code!=0) {
+                        layer.msg(succdata.info, {icon: 5});
+                        resetCode();//重置验证码
+                    }else{
+                        layer.msg(succdata.info, {icon: 1});
+                        setTimeout(function(){
+                            location.href = "/admin/index/index";
+                        }, 1000);
+                    }
+                },
+                error:function (XMLHttpRequest, textStatus, errorThrown) {
+                    layer.msg('提交失败，请重试。。', {icon: 5});
+                }
+            });
+            //阻断表单提交
+            return false;
+        });
+
+    });
+
+</script>  
+{/block}
